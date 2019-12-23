@@ -215,6 +215,7 @@ func executeStep(
 		Query:         step.QueryString,
 		QueryDocument: step.QueryDocument,
 		Variables:     variables,
+		OperationName: plan.Operation.Name,
 	}, &queryResult)
 	if err != nil {
 		log.Warn("Network Error: ", err)

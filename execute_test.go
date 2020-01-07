@@ -23,17 +23,6 @@ func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return f(req), nil
 }
 
-type testQuery struct {
-	queryer               graphql.Queryer
-	t                     *testing.T
-	expectedOperationName string
-}
-
-func (q *testQuery) Query(ctx context.Context, input *graphql.QueryInput, receiver interface{}) error {
-	assert.Equal(q.t, input.OperationName, q.expectedOperationName)
-	return q.queryer.Query(ctx, input, receiver)
-}
-
 func TestExecutor_plansOfOne(t *testing.T) {
 	// build a query plan that the executor will follow
 	result, err := (&ParallelExecutor{}).Execute(&ExecutionContext{
@@ -1577,21 +1566,18 @@ func TestExecutor_threadsVariables(t *testing.T) {
 						QueryString: `hello`,
 						Variables:   Set{"hello": true},
 						// return a known value we can test against
-						Queryer: &testQuery{
-							t:                     t,
-							expectedOperationName: "hoopla",
-							queryer: graphql.QueryerFunc(
-								func(input *graphql.QueryInput) (interface{}, error) {
-									// make sure that we got the right variable inputs
-									assert.Equal(t, map[string]interface{}{"hello": "world"}, input.Variables)
-									// and definitions
-									assert.Equal(t, ast.VariableDefinitionList{fullVariableDefs[0]}, input.QueryDocument.Operations[0].VariableDefinitions)
-									assert.Equal(t, "hello", input.Query)
+						Queryer: graphql.QueryerFunc(
+							func(input *graphql.QueryInput) (interface{}, error) {
+								// make sure that we got the right variable inputs
+								assert.Equal(t, map[string]interface{}{"hello": "world"}, input.Variables)
+								// and definitions
+								assert.Equal(t, ast.VariableDefinitionList{fullVariableDefs[0]}, input.QueryDocument.Operations[0].VariableDefinitions)
+								assert.Equal(t, "hello", input.Query)
+								assert.Equal(t, "hoopla", input.OperationName)
 
-									return map[string]interface{}{"values": []string{"world"}}, nil
-								},
-							),
-						},
+								return map[string]interface{}{"values": []string{"world"}}, nil
+							},
+						),
 					},
 				},
 			},

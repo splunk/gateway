@@ -23,15 +23,15 @@ func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return f(req), nil
 }
 
-type blehQuery struct {
+type testQuery struct {
 	queryer               graphql.Queryer
 	t                     *testing.T
 	expectedOperationName string
 }
 
-func (b *blehQuery) Query(ctx context.Context, input *graphql.QueryInput, receiver interface{}) error {
-	assert.Equal(b.t, input.OperationName, b.expectedOperationName)
-	return b.queryer.Query(ctx, input, receiver)
+func (q *testQuery) Query(ctx context.Context, input *graphql.QueryInput, receiver interface{}) error {
+	assert.Equal(q.t, input.OperationName, q.expectedOperationName)
+	return q.queryer.Query(ctx, input, receiver)
 }
 
 func TestExecutor_plansOfOne(t *testing.T) {
@@ -1577,7 +1577,7 @@ func TestExecutor_threadsVariables(t *testing.T) {
 						QueryString: `hello`,
 						Variables:   Set{"hello": true},
 						// return a known value we can test against
-						Queryer: &blehQuery{
+						Queryer: &testQuery{
 							t:                     t,
 							expectedOperationName: "hoopla",
 							queryer: graphql.QueryerFunc(

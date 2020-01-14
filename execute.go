@@ -215,16 +215,9 @@ func executeStep(
 		operationName = plan.Operation.Name
 	}
 
-	queryString := step.QueryString
-	if strings.HasPrefix(queryString, "{") {
-		queryString = strings.Join([]string{"query", operationName, queryString}, " ")
-	} else {
-		queryString = strings.Join(strings.SplitN(step.QueryString, " ", 2), " "+operationName+" ")
-	}
-
 	// fire the query
 	err := queryer.Query(ctx.RequestContext, &graphql.QueryInput{
-		Query:         queryString,
+		Query:         step.QueryString,
 		QueryDocument: step.QueryDocument,
 		Variables:     variables,
 		OperationName: operationName,

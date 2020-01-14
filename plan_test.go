@@ -1458,7 +1458,7 @@ func TestPlannerBuildQuery_query(t *testing.T) {
 	}
 
 	// the query we're building goes to the top level Query object
-	operation := plannerBuildQuery("Query", variables, selection, ast.FragmentDefinitionList{})
+	operation := plannerBuildQuery("", "Query", variables, selection, ast.FragmentDefinitionList{})
 	if operation == nil {
 		t.Error("Did not receive a query.")
 		return
@@ -1496,7 +1496,7 @@ func TestPlannerBuildQuery_node(t *testing.T) {
 	}
 
 	// the query we're building goes to the User object
-	operation := plannerBuildQuery(objType, ast.VariableDefinitionList{}, selection, ast.FragmentDefinitionList{})
+	operation := plannerBuildQuery("", objType, ast.VariableDefinitionList{}, selection, ast.FragmentDefinitionList{})
 	if operation == nil {
 		t.Error("Did not receive a query.")
 		return

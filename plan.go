@@ -244,7 +244,7 @@ func (p *MinQueriesPlanner) generatePlans(ctx *PlanningContext, query *ast.Query
 					}
 
 					// build up the query document
-					step.QueryDocument = plannerBuildQuery(step.ParentType, variableDefs, step.SelectionSet, step.FragmentDefinitions)
+					step.QueryDocument = plannerBuildQuery(plan.Operation.Name, step.ParentType, variableDefs, step.SelectionSet, step.FragmentDefinitions)
 
 					// we also need to turn the query into a string
 					queryString, err := graphql.PrintQuery(step.QueryDocument)
@@ -884,11 +884,12 @@ func (p *Planner) GetQueryer(ctx *PlanningContext, url string) graphql.Queryer {
 	return graphql.NewSingleRequestQueryer(url)
 }
 
-func plannerBuildQuery(parentType string, variables ast.VariableDefinitionList, selectionSet ast.SelectionSet, fragmentDefinitions ast.FragmentDefinitionList) *ast.QueryDocument {
+func plannerBuildQuery(operationName, parentType string, variables ast.VariableDefinitionList, selectionSet ast.SelectionSet, fragmentDefinitions ast.FragmentDefinitionList) *ast.QueryDocument {
 	log.Debug("Building Query: \n"+"\tParentType: ", parentType, " ")
 	// build up an operation for the query
 	operation := &ast.OperationDefinition{
 		VariableDefinitions: variables,
+		Name:                operationName,
 	}
 
 	// assign the right operation
